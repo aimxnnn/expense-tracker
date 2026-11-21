@@ -14,6 +14,67 @@ ALGORITHM = "HS256"
 password_hasher = PasswordHasher()
 
 
+#Afifa
+#REGISTER USER
+
+def register_user(username, email, password):
+
+    session = Session(engine)
+
+    existing_user = session.query(User).filter(User.email == email).first()
+
+    if existing_user:
+        session.close()
+        return None
+
+    hashed_password = password_hasher.hash(password)
+
+    new_user = User(
+        username=username,
+        email=email,
+        hashed_password=hashed_password
+    )
+
+    session.add(new_user)
+    session.commit()
+
+    session.close()
+
+    return True
+
+#Afifa
+#LOGIN USER
+
+def login_user(email, password):
+
+    session = Session(engine)
+
+    user = session.query(User).filter(User.email == email).first()
+
+    if user is None:
+        session.close()
+        return None
+
+    try:
+        password_hasher.verify(user.hashed_password,password)
+
+    except VerifyMismatchError:
+        session.close()
+        return None
+
+    access_token = create_token(user.email, "access")
+    refresh_token = create_token(user.email, "refresh")
+
+    session.close()
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
+
+
+
 #Shafff
 # 1. CREATE TOKEN
 
