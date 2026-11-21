@@ -27,6 +27,57 @@ app.add_middleware(
 class RefreshToken(BaseModel):
     refresh_token: str
 
+# REQUEST MODELS
+
+class RegisterModel(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class LoginModel(BaseModel):
+    email: str
+    password: str
+
+#Afifa
+#REGISTER USER
+
+@app.post("/register")
+def register_user(data: RegisterModel):
+
+    result = functions.register_user(
+        data.username,
+        data.email,
+        data.password
+    )
+
+    if result is None:
+        raise HTTPException(status_code=409, detail="Email already exists")
+
+    return {
+        "message": "User registered successfully"
+    }
+
+#Afifa
+#LOGIN USER
+
+@app.post("/login")
+def login_user(data: LoginModel):
+
+    result = functions.login_user(
+        data.email,
+        data.password
+    )
+
+    if result is None:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return {
+        "access_token": result["access_token"],
+        "refresh_token": result["refresh_token"],
+        "token_type": "bearer"
+    }
+
 
 #Shafff
 # A3 - GENERATE NEW ACCESS TOKEN
