@@ -168,3 +168,61 @@ def get_user_expenses(email):
     session.close()
 
     return response
+
+
+#Aiman
+# E2 - CREATE EXPENSE FOR LOGGED-IN USER
+
+def create_expense(authorization, title, amount, category, expense_date):
+
+    if authorization is None:
+        return {"error": "Authentication required", "code": 401, "expense": None}
+
+    if not authorization.startswith("Bearer "):
+        return {"error": "Invalid authorization header", "code": 401, "expense": None}
+
+    token = authorization.replace("Bearer ", "", 1)
+
+    email = verify_token(token, "access")
+
+    if email is None:
+        return {"error": "Invalid or expired access token", "code": 401, "expense": None}
+
+    if title.strip() == "" or category.strip() == "":
+        return {"error": "Title and category cannot be empty", "code": 422, "expense": None}
+
+    session = Session(engine)
+
+    user = session.query(User).filter(
+        User.email == email
+    ).first()
+
+    if user is None:
+        session.close()
+        return {"error": "User not found", "code": 401, "expense": None}
+
+    new_expense = Expense(
+        user_id=user.id,
+        title=title,
+        amount=amount,
+        category=category,
+        expense_date=expense_date
+    )
+
+    session.add(new_expense)
+    session.commit()
+    session.refresh(new_expense)
+
+    response = {
+        "id": new_expense.id,
+        "user_id": new_expense.user_id,
+        "title": new_expense.title,
+        "amount": new_expense.amount,
+        "category": new_expense.category,
+        "expense_date": new_expense.expense_date,
+        "created_at": new_expense.created_at
+    }
+
+    session.close()
+
+    return {"error": None, "code": 201, "expense": response}

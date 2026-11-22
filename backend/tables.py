@@ -1,8 +1,11 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
+import os
 
-engine = create_engine("sqlite:///./expenses.db", connect_args={"check_same_thread": False})
+os.makedirs("data", exist_ok=True)
+
+engine = create_engine("sqlite:///./data/expenses.db", connect_args={"check_same_thread": False})
 
 Base = declarative_base()
 
@@ -27,3 +30,6 @@ class Expense(Base):
     category = Column(String, nullable=False)
     expense_date = Column(Date, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
+
+
+Base.metadata.create_all(bind=engine)

@@ -1,3 +1,7 @@
-fastapi>=0.110.0
-uvicorn>=0.28.0
-sqlalchemy>=2.0.0
+fastapi
+uvicorn
+sqlalchemy
+argon2-cffi
+pyjwt
+pydantic
+email-validator

@@ -1,21 +1,20 @@
+from datetime import date
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 import functions
 
-from tables import Base, engine
 
-
-app = FastAPI()
-
-Base.metadata.create_all(bind=engine)
+app = FastAPI(
+    title="Expense Tracker"
+    )
 
 
 # CORS
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -30,14 +29,21 @@ class RefreshToken(BaseModel):
 # REQUEST MODELS
 
 class RegisterModel(BaseModel):
-    username: str
-    email: str
-    password: str
+    username: str = Field(min_length=1)
+    email: EmailStr
+    password: str = Field(min_length=1)
 
 
 class LoginModel(BaseModel):
-    email: str
-    password: str
+    email: str = Field(min_length=1)
+    password: str = Field(min_length=1)
+
+
+class ExpenseModel(BaseModel):
+    title: str = Field(min_length=1)
+    amount: float = Field(gt=0)
+    category: str = Field(min_length=1)
+    expense_date: date
 
 #Afifa
 #REGISTER USER
@@ -122,3 +128,23 @@ def get_expenses(authorization: str = Header(None)):
     return {
         "expenses": expenses
     }
+
+
+#Aiman
+# E2 - CREATE EXPENSE FOR LOGGED-IN USER
+
+@app.post("/expenses", status_code=201)
+def create_expense(data: ExpenseModel, authorization: str = Header(None)):
+
+    result = functions.create_expense(
+        authorization,
+        data.title,
+        data.amount,
+        data.category,
+        data.expense_date
+    )
+
+    if result["error"] is not None:
+        raise HTTPException(status_code=result["code"], detail=result["error"])
+
+    return result["expense"]
