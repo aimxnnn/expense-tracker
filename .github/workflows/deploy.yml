@@ -9,7 +9,7 @@ jobs:
   build-push-deploy:
     runs-on: ubuntu-latest
     env:
-      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker
+      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expensetracker
       VERSION: v${{ github.run_number }}
     steps:
       - uses: actions/checkout@v4
