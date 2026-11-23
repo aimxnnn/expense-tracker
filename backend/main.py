@@ -105,15 +105,10 @@ def refresh_token(data: RefreshToken):
 # E1 - GET ALL EXPENSES OF LOGGED-IN USER
 
 @app.get("/expenses")
-def get_expenses(authorization: str = Header(None)):
+def get_expenses(token: str = Header(None)):
 
-    if authorization is None:
+    if token is None:
         raise HTTPException(status_code=401, detail="Authentication required")
-
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
-
-    token = authorization.replace("Bearer ", "", 1)
 
     email = functions.verify_token(token, "access")
 
@@ -129,15 +124,14 @@ def get_expenses(authorization: str = Header(None)):
         "expenses": expenses
     }
 
-
 #Aiman
 # E2 - CREATE EXPENSE FOR LOGGED-IN USER
 
 @app.post("/expenses", status_code=201)
-def create_expense(data: ExpenseModel, authorization: str = Header(None)):
+def create_expense(data: ExpenseModel, token: str = Header(None)):
 
     result = functions.create_expense(
-        authorization,
+        token,
         data.title,
         data.amount,
         data.category,

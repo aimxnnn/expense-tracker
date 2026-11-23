@@ -173,15 +173,10 @@ def get_user_expenses(email):
 #Aiman
 # E2 - CREATE EXPENSE FOR LOGGED-IN USER
 
-def create_expense(authorization, title, amount, category, expense_date):
+def create_expense(token, title, amount, category, expense_date):
 
-    if authorization is None:
+    if token is None:
         return {"error": "Authentication required", "code": 401, "expense": None}
-
-    if not authorization.startswith("Bearer "):
-        return {"error": "Invalid authorization header", "code": 401, "expense": None}
-
-    token = authorization.replace("Bearer ", "", 1)
 
     email = verify_token(token, "access")
 
