@@ -50,7 +50,7 @@ function App() {
       .catch(() => setMsg("Cannot reach the server"));
   }
 
-    function getExpenses(tok, tried) {
+      function getExpenses(tok, tried) {
     fetch(API_URL + "/expenses", {
       headers: { token: tok },
     })
@@ -69,7 +69,7 @@ function App() {
       })
       .catch(() => setMsg("Cannot reach the server"));
   }
-
+  
   useEffect(() => {
     if (token !== "") {
       getExpenses(token, false);
