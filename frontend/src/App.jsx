@@ -50,9 +50,9 @@ function App() {
       .catch(() => setMsg("Cannot reach the server"));
   }
 
-  function getExpenses(tok, tried) {
+    function getExpenses(tok, tried) {
     fetch(API_URL + "/expenses", {
-      headers: { Authorization: "Bearer " + tok },
+      headers: { token: tok },
     })
       .then((res) => res.json())
       .then((data) => {
